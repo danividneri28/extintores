@@ -35,10 +35,29 @@ export default function Inventarios() {
     };
 
     const columns = [
-
+        { field: 'id', headerName: 'ID', flex: 1},
+        { field: 'nombre', headerName: 'Nombre', flex: 2},
+        { field: 'categoria', headerName: 'Categoria', flex: 2 },
+        { field: 'precio', headerName: 'Precio' , flex: 1, type: 'number'},
+        { field: 'cantidad', headerName: 'Cantidad', flex: 1 , type: 'number'},
+        { field: 'total', headerName: 'Total' , flex: 1, type: 'number'},
+        { field: 'fecha', headerName: 'Fecha de Ultima Modificación', flex: 2},
     ];
 
     const rows = inventarios.map((inventario) => ({
+        id: inventario.id,
+        nombre: inventario.producto.nombre,
+        categoria: inventario.producto.categoria.nombre,
+        precio: "$" + inventario.producto.precio.toFixed(2),
+        cantidad: inventario.stock,
+        total: "$" + (inventario.producto.precio * inventario.stock).toFixed(2),
+        fecha: new Date(inventario.updated_at).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        }),
 
     }));
 

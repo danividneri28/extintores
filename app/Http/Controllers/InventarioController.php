@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventario;
+use App\Models\Producto;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,8 +15,8 @@ class InventarioController extends Controller
      */
     public function index():Response
     {
-        $inventarios = Inventario::with('producto')->get();
-        $productos = Inventario::all();
+        $inventarios = Inventario::with('producto', 'producto.categoria')->get();
+        $productos = Producto::all();
 
          return Inertia::render('Inventarios/index', [
             'inventarios' => $inventarios,
@@ -36,7 +37,26 @@ class InventarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'producto_id' => 'required|exists:productos,id',
+            'stock' => 'required|integer|min:0',
+        ]);
+
+        // Check if the product already has an inventory entry
+        $existingInventario = Inventario::where('producto_id', $request->producto_id)->first();
+        if ($existingInventario) {
+            Inventario::where('producto_id', $request->producto_id)->update([
+                'stock' => $existingInventario->stock + $request->stock,
+            ]);
+        }
+        else {
+            Inventario::create([
+                'producto_id' => $request->producto_id,
+                'stock' => $request->stock,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Inventario creado con éxito.');
     }
 
     /**
